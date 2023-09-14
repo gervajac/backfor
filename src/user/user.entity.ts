@@ -6,3 +6,5 @@ export  class User {
     mail: string
     password: string
 }
+
+const user = new User()
