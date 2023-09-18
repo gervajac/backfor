@@ -22,7 +22,7 @@ export class User {
     @Column({type: "datetime", default: () => "CURRENT_TIMESTAMP"})
     createdAt: Date;
 
-    @OneToMany(type => Post, post => post.user)
+    @OneToMany(type => Post, post => post.author)
     posts: Post[];
 
     @OneToMany(type => Comment, comment => comment.user) // Un usuario puede tener muchos comentarios

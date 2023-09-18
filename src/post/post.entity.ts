@@ -13,18 +13,20 @@ export class Post {
     @Column()
     description: string
 
+    @Column("simple-array", {nullable: true}) 
+    image: string[] | null;
+
     @Column({nullable: true})
-    image: string
+    authorId: string
 
     @Column({type: "datetime", default: () => "CURRENT_TIMESTAMP"})
     createdAt: Date
 
-    @ManyToOne(type => User) // Cambiado a ManyToOne
-    user: User; // Cambiado de users a user
+    @ManyToOne(type => User, user => user.posts)
+    author: User
 
-    @JoinTable()
     @OneToMany(type => Comment, comment => comment.post)
-    comments: Comment[];
+    comments: Comment[]
 }
 
 const post = new Post()

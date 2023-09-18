@@ -20,7 +20,7 @@ import { CommentModule } from './comment/comment.module';
     UserModule,
     PostModule,
     CommentModule],
-  controllers: [CommentController],
+  controllers: [],
   providers: [],
 })
 export class AppModule {}

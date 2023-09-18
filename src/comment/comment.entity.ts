@@ -13,6 +13,12 @@ export class Comment {
     @Column({nullable: true})
     image: string
 
+    @Column({nullable: true})
+    authorId: string
+
+    @Column({nullable: true})
+    postId: string
+
     @Column({type: "datetime", default: () => "CURRENT_TIMESTAMP"})
     createdAt: Date
 
