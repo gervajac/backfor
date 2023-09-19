@@ -10,6 +10,7 @@ export class UserService {
 constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
 
     async createUser(user) {
+      console.log(user, "como le llega")
       const duplicateUser = await this.userRepository.findOne({
          where: {
             userName: user.userName 

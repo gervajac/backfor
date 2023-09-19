@@ -10,6 +10,7 @@ import { PostModule } from 'src/post/post.module';
 @Module({
   imports: [TypeOrmModule.forFeature([Comment]), UserModule, PostModule],
   controllers: [CommentController],
-  providers: [CommentService]
+  providers: [CommentService],
+  exports: [CommentService]
 })
 export class CommentModule {}

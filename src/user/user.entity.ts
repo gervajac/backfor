@@ -25,7 +25,7 @@ export class User {
     @OneToMany(type => Post, post => post.author)
     posts: Post[];
 
-    @OneToMany(type => Comment, comment => comment.user) // Un usuario puede tener muchos comentarios
+    @OneToMany(type => Comment, comment => comment.author) // Un usuario puede tener muchos comentarios
     comments: Comment[]; // Agregado el campo 'comments'
 }
 

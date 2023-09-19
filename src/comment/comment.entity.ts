@@ -23,7 +23,7 @@ export class Comment {
     createdAt: Date
 
     @ManyToOne(type => User, user => user.comments) // Un comentario pertenece a un usuario
-    user: User;
+    author: User;
 
     @ManyToOne(type => Post, post => post.comments) // Un comentario pertenece a un post
     post: Post;

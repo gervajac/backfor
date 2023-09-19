@@ -20,19 +20,40 @@ export class PostService {
        return this.postRepository.save(newPost)
     }
 
-    getPost() {
-        return this.postRepository.find({
+    async getPost() {
+        const post = await this.postRepository.find({
             relations: ["author", "comments"],
         });
-    }
 
+        const programacionPosts = await this.postRepository.find({
+            where: { section: 'Programacion' },
+            relations: ["author", "comments"],
+        });
+    
+        const empleosPosts = await this.postRepository.find({
+            where: { section: 'Empleos' },
+            relations: ["author", "comments"],
+        });
+    
+        const educacionPosts = await this.postRepository.find({
+            where: { section: 'Educacion' },
+            relations: ["author", "comments"],
+        });
+
+        return {
+            programacion: programacionPosts,
+            empleos: empleosPosts,
+            educacion: educacionPosts,
+            post: post
+        };
+    }
     async getOnePost(id: string) {
         console.log(id)
         const postFound = await this.postRepository.findOne({
              where: {
                  id: id
              },
-             relations: ["author"]
+             relations: ["author", "comments"]
          })
          console.log(postFound)
          if(!postFound) return new HttpException("Post no encontrado", HttpStatus.NOT_FOUND);

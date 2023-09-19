@@ -12,6 +12,13 @@ export class CommentController {
         return this.CommentService.createComment(comment)
     }
 
-
+    @Get(":id")
+    async getOneUser(@Param("id") id: string) {
+      const foundPost = await this.CommentService.getOnePost(id);
+      if (!foundPost) {
+        throw new NotFoundException('Post no encontrado');
+      }
+      return foundPost;
+    }
 
 }

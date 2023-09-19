@@ -19,6 +19,12 @@ export class Post {
     @Column({nullable: true})
     authorId: string
 
+    @Column({
+        type: "enum",
+        enum: ["Programacion", "Educacion", "Empleos"]
+    })
+    section: string;
+
     @Column({type: "datetime", default: () => "CURRENT_TIMESTAMP"})
     createdAt: Date
 

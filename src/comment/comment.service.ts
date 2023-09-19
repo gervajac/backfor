@@ -18,4 +18,18 @@ export class CommentService {
     return this.commentRepository.save(newComment)
  }
 
+ async getOnePost(id: string) {
+   console.log(id)
+   const commentsFound = await this.commentRepository.find({
+        where: {
+            postId: id
+        },
+        relations: ["author", "post"]
+    })
+    console.log(commentsFound)
+    if(!commentsFound) return new HttpException("Post no encontrado", HttpStatus.NOT_FOUND);
+
+    return commentsFound;
+ }
+
 }

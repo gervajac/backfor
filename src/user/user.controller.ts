@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Body, Patch, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Req, Patch, Param, NotFoundException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.entity';
 
@@ -22,7 +22,8 @@ export class UserController {
     }
 
     @Post()
-    createUser(@Body() newUser) {
+    createUser(@Req() req, @Body() newUser) {
+      console.log(newUser, "newsuser")
        return this.UserService.createUser(newUser)
     }
 
