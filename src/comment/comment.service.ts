@@ -4,12 +4,13 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm"
 import { UserService } from 'src/user/user.service';
 import { PostService } from 'src/post/post.service';
+import { Post } from 'src/post/post.entity';
 
 @Injectable()
 export class CommentService {
 
- constructor(@InjectRepository(Comment) private commentRepository: Repository<Comment>,
- private userService: UserService, private postService: PostService) {}
+ constructor(@InjectRepository(Comment) private commentRepository: Repository<Comment>, @InjectRepository(Post) private postRepository: Repository<Post>,
+ private userService: UserService) {}
 
  async createComment(comment: any) {
     const userFound = await this.userService.getOneUser(comment.authorId);
@@ -26,10 +27,16 @@ export class CommentService {
         },
         relations: ["author", "post"]
     })
+    const postFound = await this.postRepository.findOne({
+        where: {
+            id: id
+        },
+        relations: ["author"]
+    })
     console.log(commentsFound)
     if(!commentsFound) return new HttpException("Post no encontrado", HttpStatus.NOT_FOUND);
 
-    return commentsFound;
+    return {commentsFound: commentsFound, postFound: postFound};
  }
 
 }

@@ -3,12 +3,15 @@ import { Post } from './post.entity';
 import {Repository} from "typeorm"
 import {InjectRepository} from "@nestjs/typeorm";
 import { UserService } from 'src/user/user.service';
+import { Comment } from 'src/comment/comment.entity';
+import { CommentService } from 'src/comment/comment.service';
 
 @Injectable()
 export class PostService {
 
-    constructor(@InjectRepository(Post) private postRepository: Repository<Post>,
-    private userService: UserService) {}
+    constructor(@InjectRepository(Post) private postRepository: Repository<Post>, @InjectRepository(Comment) private commentRepository: Repository<Comment>,
+    private userService: UserService, private commentService: CommentService) {}
+
 
     async createPost(post: any) {
        const userFound = await this.userService.getOneUser(post.authorId);
@@ -47,6 +50,19 @@ export class PostService {
             post: post
         };
     }
+
+    async getSectionPost(section) {
+
+        const posts = await this.postRepository.find({
+            where: {section: section},
+            relations: ["author", "comments"],
+        });
+        console.log(posts, "POST OBTENIDOS")
+        return {
+            posts: posts
+        };
+    }
+
     async getOnePost(id: string) {
         console.log(id)
         const postFound = await this.postRepository.findOne({
@@ -55,10 +71,13 @@ export class PostService {
              },
              relations: ["author", "comments"]
          })
-         console.log(postFound)
+         const commentsFound = await this.commentRepository.find({
+            where: {postId: postFound.id},
+        })
+         console.log(commentsFound)
          if(!postFound) return new HttpException("Post no encontrado", HttpStatus.NOT_FOUND);
  
-         return postFound;
+         return {postFound: postFound, comments: commentsFound};
       }
 
 }

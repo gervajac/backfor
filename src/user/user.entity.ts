@@ -9,8 +9,8 @@ export class User {
 
     @Column({unique: true})
     userName: string
-
-    @Column({nullable: true})
+    
+    @Column({nullable: true, default: "https://toppng.com/uploads/preview/vu-thi-ha-user-pro-icon-115534024853ae3gswzwd.png"})
     image: string
 
     @Column()

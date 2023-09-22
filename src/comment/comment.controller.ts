@@ -9,6 +9,7 @@ export class CommentController {
 
     @Post()
     CreateComment(@Body() comment: any) {
+      console.log(comment, "como le llega comentt")
         return this.CommentService.createComment(comment)
     }
 

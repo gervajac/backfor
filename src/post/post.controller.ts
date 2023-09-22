@@ -16,6 +16,16 @@ export class PostController {
         return this.PostService.getPost();
     }
 
+    @Get("/sections/:section")
+    async getSectionPost(@Param("section") section: string) {
+      console.log(section, "le lñlega?")
+      const foundedPosts = await this.PostService.getSectionPost(section);
+      if (!foundedPosts) {
+        throw new NotFoundException('Post no encontrado');
+      }
+      return foundedPosts;
+    }
+
     @Get(":id")
     async getOneUser(@Param("id") id: string) {
       const foundPost = await this.PostService.getOnePost(id);

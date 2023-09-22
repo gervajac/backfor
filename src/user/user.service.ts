@@ -10,7 +10,6 @@ export class UserService {
 constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
 
     async createUser(user) {
-      console.log(user, "como le llega")
       const duplicateUser = await this.userRepository.findOne({
          where: {
             userName: user.userName 
@@ -19,6 +18,23 @@ constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
       if(duplicateUser) return new HttpException("El usuario ya existe", HttpStatus.CONFLICT)
        const newUser = this.userRepository.create(user)
        return this.userRepository.save(newUser)
+    }
+
+    async loginUser(loginData) {
+      console.log(loginData, "logindata")
+      const user = await this.userRepository.findOne({
+         where: {
+            userName: "arnold" 
+         }
+      })
+      console.log(user, "userfinded")
+      console.log(user.password, loginData.password, "?")
+      if(!user) return new HttpException("No se encontro usuario", HttpStatus.NOT_FOUND);
+      if(user.password !== loginData.password) return new HttpException("Contraseña invalida", HttpStatus.UNAUTHORIZED);
+       const savedUser = await this.userRepository.save(user)
+       return{
+         user: savedUser
+       }
     }
 
     getUser() {

@@ -22,9 +22,15 @@ export class UserController {
     }
 
     @Post()
-    createUser(@Req() req, @Body() newUser) {
+    createUser(@Body() newUser) {
       console.log(newUser, "newsuser")
        return this.UserService.createUser(newUser)
+    }
+
+    @Post("/login")
+    loginUser(@Body() newUser) {
+      console.log(newUser)
+       return this.UserService.loginUser(newUser)
     }
 
     @Delete(":id")
