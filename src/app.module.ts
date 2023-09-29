@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostModule } from './post/post.module';
 import { CommentController } from './comment/comment.controller';
 import { CommentModule } from './comment/comment.module';
+import { PerfilcommentModule } from './perfilcomment/perfilcomment.module';
 
 
 @Module({
@@ -20,7 +21,8 @@ import { CommentModule } from './comment/comment.module';
     }),
     UserModule,
     PostModule,
-    CommentModule],
+    CommentModule,
+    PerfilcommentModule],
   controllers: [],
   providers: [],
 })

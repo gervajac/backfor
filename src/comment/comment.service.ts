@@ -31,12 +31,12 @@ export class CommentService {
         where: {
             id: id
         },
-        relations: ["author"]
+        relations: ["author", "likes"]
     })
-    console.log(commentsFound)
+    console.log(postFound, "postencontrado")
     if(!commentsFound) return new HttpException("Post no encontrado", HttpStatus.NOT_FOUND);
-
-    return {commentsFound: commentsFound, postFound: postFound};
+    const likesIDs = postFound.likes.map(like => like.id);
+    return {commentsFound: commentsFound, postFound: postFound, likes: likesIDs};
  }
 
 }

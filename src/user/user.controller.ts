@@ -27,9 +27,21 @@ export class UserController {
        return this.UserService.createUser(newUser)
     }
 
+    @Post("/comment/:id")
+    CreateComment(@Param("id") id: any, @Body() comment: any) {
+      console.log(id,  "como le llega comenttssss")
+       // return this.UserService.createPerfilComment(id, comment)
+    }
+
+    @Post("/like/:id")
+    like(@Param("id") id: any, @Body() idUser) {
+      console.log(id, idUser)
+        return this.UserService.like(id, idUser.userId)
+    }
+
     @Post("/login")
     loginUser(@Body() newUser) {
-      console.log(newUser)
+      console.log(newUser, "newuser")
        return this.UserService.loginUser(newUser)
     }
 
@@ -44,6 +56,8 @@ export class UserController {
 
     @Patch(":id")
     async updateUser(@Param("id") id: string, @Body() user: any) {
+      console.log(id, "id")
+      console.log(user, "user")
         const updatedUser = await this.UserService.updateUser(id, user);
         if (!updatedUser) {
             throw new NotFoundException('Usuario no encontrado');

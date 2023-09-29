@@ -33,6 +33,11 @@ export class Post {
 
     @OneToMany(type => Comment, comment => comment.post)
     comments: Comment[]
+
+    @ManyToMany(type => User, user => user.likedPosts)
+    @JoinTable()
+    likes: User[];
+
 }
 
 const post = new Post()

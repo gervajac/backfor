@@ -23,33 +23,50 @@ export class PostService {
        return this.postRepository.save(newPost)
     }
 
-    async getPost() {
-        const post = await this.postRepository.find({
-            relations: ["author", "comments"],
-        });
-
-        const programacionPosts = await this.postRepository.find({
+async getPost() {
+    const [programacionPosts, empleosPosts, educacionPosts, post] = await Promise.all([
+        this.postRepository.find({
             where: { section: 'Programacion' },
-            relations: ["author", "comments"],
-        });
-    
-        const empleosPosts = await this.postRepository.find({
+            relations: ["author", "comments", "likes"],
+        }),
+        this.postRepository.find({
             where: { section: 'Empleos' },
-            relations: ["author", "comments"],
-        });
-    
-        const educacionPosts = await this.postRepository.find({
+            relations: ["author", "comments", "likes"],
+        }),
+        this.postRepository.find({
             where: { section: 'Educacion' },
-            relations: ["author", "comments"],
-        });
+            relations: ["author", "comments", "likes"],
+        }),
+        this.postRepository.find({
+            relations: ["author", "comments", "likes"],
+        })
+    ]);
 
+    const getPostDetails = (posts) => posts.map(post => {
+        const { author, likes, comments } = post;
         return {
-            programacion: programacionPosts,
-            empleos: empleosPosts,
-            educacion: educacionPosts,
-            post: post
+            id: post.id,
+            title: post.title,
+            description: post.description,
+            author: {
+                id: author.id,
+                name: author.name,
+                image: author.image,
+                userName: author.userName
+                // Añade más detalles del autor si es necesario
+            },
+            likesCount: likes.length,
+            commentsCount: comments.length
         };
-    }
+    });
+
+    return {
+        programacion: getPostDetails(programacionPosts),
+        empleos: getPostDetails(empleosPosts),
+        educacion: getPostDetails(educacionPosts),
+        post: getPostDetails(post)
+    };
+}
 
     async getSectionPost(section) {
 
@@ -59,7 +76,7 @@ export class PostService {
         });
         console.log(posts, "POST OBTENIDOS")
         return {
-            posts: posts
+            post: posts
         };
     }
 
@@ -69,12 +86,12 @@ export class PostService {
              where: {
                  id: id
              },
-             relations: ["author", "comments"]
+             relations: ["author", "comments", "likes"]
          })
          const commentsFound = await this.commentRepository.find({
             where: {postId: postFound.id},
         })
-         console.log(commentsFound)
+         console.log(postFound, "postencontrados")
          if(!postFound) return new HttpException("Post no encontrado", HttpStatus.NOT_FOUND);
  
          return {postFound: postFound, comments: commentsFound};
