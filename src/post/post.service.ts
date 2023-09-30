@@ -5,23 +5,38 @@ import {InjectRepository} from "@nestjs/typeorm";
 import { UserService } from 'src/user/user.service';
 import { Comment } from 'src/comment/comment.entity';
 import { CommentService } from 'src/comment/comment.service';
+import { User } from 'src/user/user.entity';
 
 @Injectable()
 export class PostService {
 
-    constructor(@InjectRepository(Post) private postRepository: Repository<Post>, @InjectRepository(Comment) private commentRepository: Repository<Comment>,
+    constructor(@InjectRepository(Post) private postRepository: Repository<Post>, 
+    @InjectRepository(Comment) private commentRepository: Repository<Comment>,
+    @InjectRepository(User) private userRepository: Repository<User>,
     private userService: UserService, private commentService: CommentService) {}
 
 
     async createPost(post: any) {
-       const userFound = await this.userService.getOneUser(post.authorId);
-       console.log(post.authorId)
-       if(!userFound) return new HttpException("user not found", HttpStatus.NOT_FOUND);
 
-       
-       const newPost = this.postRepository.create(post)
-       return this.postRepository.save(newPost)
-    }
+        try{
+            const userFound = await this.userService.getOneUser(post.authorId);
+     
+            if (userFound instanceof User) {
+                userFound.points += 5;
+            } else {
+                return new HttpException("User not found", HttpStatus.NOT_FOUND);
+            }
+            const newPost = this.postRepository.create(post);
+
+            console.log(newPost, "nuyevospost")
+            console.log(userFound)
+            await this.userRepository.save(userFound)
+            return this.postRepository.save(newPost);
+        }catch(err){
+            throw new HttpException("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+     }
 
 async getPost() {
     const [programacionPosts, empleosPosts, educacionPosts, post] = await Promise.all([
@@ -60,11 +75,20 @@ async getPost() {
         };
     });
 
+    const rank = await this.userRepository.find({
+        select: ["id", "userName", "points"],
+        order: {
+            points: 'DESC'
+        },
+        take: 5 
+    });
+    console.log(rank)
     return {
         programacion: getPostDetails(programacionPosts),
         empleos: getPostDetails(empleosPosts),
         educacion: getPostDetails(educacionPosts),
-        post: getPostDetails(post)
+        post: getPostDetails(post),
+        rank: rank
     };
 }
 

@@ -45,6 +45,9 @@ export class User {
     @Column({nullable: true})
     country: string
 
+    @Column({nullable: true, default: 0})
+    points: number
+
     @Column()
     password: string
 

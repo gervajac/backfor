@@ -85,7 +85,6 @@ constructor(@InjectRepository(User) private userRepository: Repository<User>,
   }
 
   async like(idPost: any, idUser: any){
-   console.log(idPost, idUser)
       const findedUser = await this.userRepository.findOne({
          where: {
             id: idUser
@@ -95,11 +94,16 @@ constructor(@InjectRepository(User) private userRepository: Repository<User>,
       const findedPost = await this.postRepository.findOne({
          where: {
             id: idPost
-         }
+         },
+         relations: ["author"]
       })
+      console.log(findedPost.author, "postt")
       if (findedUser && findedPost) {
+         findedPost.author.points += 2; // Incrementar los puntos del autor del post
          findedUser.likedPosts = [...findedUser.likedPosts, findedPost];
+         
          await this.userRepository.save(findedUser);
+         await this.userRepository.save(findedPost.author); // Guardar los puntos del autor
        }
   }
 
