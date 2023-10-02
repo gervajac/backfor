@@ -25,20 +25,36 @@ constructor(@InjectRepository(User) private userRepository: Repository<User>,
     }
 
     async loginUser(loginData) {
-      console.log(loginData, "logindata")
-      const user = await this.userRepository.findOne({
-         where: {
-            userName: loginData.userName
-         }
-      })
-      console.log(user, "userfinded")
-      console.log(user.password, loginData.password, "?")
-      if(!user) return new HttpException("No se encontro usuario", HttpStatus.NOT_FOUND);
-      if(user.password !== loginData.password) return new HttpException("Contraseña invalida", HttpStatus.UNAUTHORIZED);
-       const savedUser = await this.userRepository.save(user)
-       return{
-         user: savedUser
-       }
+      try {
+        const user = await this.userRepository.findOne({
+          where: [
+            { userName: loginData.userName },
+            { mail: loginData.userName }
+          ]
+        });
+    
+        if (!user) {
+          throw new HttpException("No se encontró usuario", HttpStatus.NOT_FOUND);
+        }
+    
+        const isPasswordValid = user.password === loginData.password;
+    
+        if (!isPasswordValid) {
+          throw new HttpException("Contraseña inválida", HttpStatus.UNAUTHORIZED);
+        }
+    
+        const savedUser = await this.userRepository.save(user);
+    
+        // Aquí, si deseas, podrías generar un token JWT y enviarlo junto con el usuario
+        // Esto sería útil para mantener al usuario autenticado en sesiones posteriores
+    
+        return {
+          user: savedUser
+        };
+      } catch (error) {
+        // Manejo de errores
+        throw new HttpException("Error al autenticar usuario", HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     }
 
     getUser() {

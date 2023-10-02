@@ -38,59 +38,91 @@ export class PostService {
 
      }
 
-async getPost() {
-    const [programacionPosts, empleosPosts, educacionPosts, post] = await Promise.all([
-        this.postRepository.find({
-            where: { section: 'Programacion' },
-            relations: ["author", "comments", "likes"],
-        }),
-        this.postRepository.find({
-            where: { section: 'Empleos' },
-            relations: ["author", "comments", "likes"],
-        }),
-        this.postRepository.find({
-            where: { section: 'Educacion' },
-            relations: ["author", "comments", "likes"],
-        }),
-        this.postRepository.find({
-            relations: ["author", "comments", "likes"],
-        })
-    ]);
-
-    const getPostDetails = (posts) => posts.map(post => {
-        const { author, likes, comments } = post;
-        return {
-            id: post.id,
-            title: post.title,
-            description: post.description,
-            author: {
-                id: author.id,
-                name: author.name,
-                image: author.image,
-                userName: author.userName
-                // Añade más detalles del autor si es necesario
+     async getPost() {
+        const [programacionPosts, empleosPosts, educacionPosts, post] = await Promise.all([
+            this.postRepository.createQueryBuilder('post')
+                .leftJoinAndSelect('post.author', 'author')
+                .leftJoinAndSelect('post.comments', 'comments')
+                .leftJoinAndSelect('post.likes', 'likes')
+                .where('post.section = :section', { section: 'Programacion' })
+                .addSelect(subQuery => {
+                    return subQuery
+                        .select('COUNT(*)', 'commentsCount')
+                        .from('comment', 'comment')
+                        .where('comment.postId = post.id');
+                }, 'commentsCount')
+                .orderBy('commentsCount', 'DESC')
+                .getMany(),
+            this.postRepository.createQueryBuilder('post')
+                .leftJoinAndSelect('post.author', 'author')
+                .leftJoinAndSelect('post.comments', 'comments')
+                .leftJoinAndSelect('post.likes', 'likes')
+                .where('post.section = :section', { section: 'Empleos' })
+                .addSelect(subQuery => {
+                    return subQuery
+                        .select('COUNT(*)', 'commentsCount')
+                        .from('comment', 'comment')
+                        .where('comment.postId = post.id');
+                }, 'commentsCount')
+                .orderBy('commentsCount', 'DESC')
+                .getMany(),
+            this.postRepository.createQueryBuilder('post')
+                .leftJoinAndSelect('post.author', 'author')
+                .leftJoinAndSelect('post.comments', 'comments')
+                .leftJoinAndSelect('post.likes', 'likes')
+                .where('post.section = :section', { section: 'Educacion' })
+                .addSelect(subQuery => {
+                    return subQuery
+                        .select('COUNT(*)', 'commentsCount')
+                        .from('comment', 'comment')
+                        .where('comment.postId = post.id');
+                }, 'commentsCount')
+                .orderBy('commentsCount', 'DESC')
+                .getMany(),
+            this.postRepository.createQueryBuilder('post')
+                .leftJoinAndSelect('post.author', 'author')
+                .leftJoinAndSelect('post.comments', 'comments')
+                .leftJoinAndSelect('post.likes', 'likes')
+                .orderBy('post.id', 'DESC')
+                .take(8)
+                .getMany()
+        ]);
+    
+        const getPostDetails = (posts) => posts.map(post => {
+            const { author, likes, commentsCount, comments } = post;
+            return {
+                id: post.id,
+                title: post.title,
+                description: post.description,
+                author: {
+                    id: author.id,
+                    name: author.name,
+                    image: author.image,
+                    userName: author.userName
+                },
+                likesCount: likes.length,
+                commentsCount: commentsCount,
+                comments: comments // Mantener las relaciones cargadas
+            };
+        });
+    
+        const rank = await this.userRepository.find({
+            select: ["id", "userName", "points"],
+            order: {
+                points: 'DESC'
             },
-            likesCount: likes.length,
-            commentsCount: comments.length
+            take: 5 
+        });
+        console.log(rank);
+    
+        return {
+            programacion: getPostDetails(programacionPosts),
+            empleos: getPostDetails(empleosPosts),
+            educacion: getPostDetails(educacionPosts),
+            post: getPostDetails(post),
+            rank: rank
         };
-    });
-
-    const rank = await this.userRepository.find({
-        select: ["id", "userName", "points"],
-        order: {
-            points: 'DESC'
-        },
-        take: 5 
-    });
-    console.log(rank)
-    return {
-        programacion: getPostDetails(programacionPosts),
-        empleos: getPostDetails(empleosPosts),
-        educacion: getPostDetails(educacionPosts),
-        post: getPostDetails(post),
-        rank: rank
-    };
-}
+    }
 
     async getSectionPost(section) {
 
@@ -99,6 +131,18 @@ async getPost() {
             relations: ["author", "comments"],
         });
         console.log(posts, "POST OBTENIDOS")
+        return {
+            post: posts
+        };
+    }
+
+    async filterPost(word) {
+        const posts = await this.postRepository.createQueryBuilder("post")
+            .leftJoinAndSelect("post.author", "author")
+            .leftJoinAndSelect("post.comments", "comments")
+            .where("post.title LIKE :word", { word: `%${word}%` })
+            .getMany();
+
         return {
             post: posts
         };
