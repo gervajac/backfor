@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Delete, Body, Req, Patch, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Req, UseGuards, Patch, Param, NotFoundException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.entity';
+import { AuthMiddleware } from 'src/middleware/auth-middleware';
 
 @Controller('user')
 export class UserController {
@@ -8,7 +9,7 @@ export class UserController {
     constructor(private UserService: UserService){}
 
     @Get()
-    getUsers(): Promise<User[]> {
+    getUsers() {
         return this.UserService.getUser();
     }
 
@@ -55,6 +56,7 @@ export class UserController {
     }
 
     @Patch(":id")
+    @UseGuards(AuthMiddleware)
     async updateUser(@Param("id") id: string, @Body() user: any) {
       console.log(id, "id")
       console.log(user, "user")

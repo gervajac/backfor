@@ -37,6 +37,9 @@ export class User {
     career: string
 
     @Column({nullable: true})
+    token: string
+
+    @Column({nullable: true})
     city: string
 
     @Column({nullable: true})

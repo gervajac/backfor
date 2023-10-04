@@ -13,8 +13,8 @@ export class Post {
     @Column()
     description: string
 
-    @Column("simple-array", {nullable: true}) 
-    image: string[] | null;
+    @Column({nullable: true}) 
+    image: string;
 
     @Column({nullable: true})
     authorId: string

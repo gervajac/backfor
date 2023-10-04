@@ -1,9 +1,11 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import {InjectRepository} from "@nestjs/typeorm";
+import * as jwt from 'jsonwebtoken'
 import { PerfilComment } from 'src/perfilcomment/perfilcomment.entity';
 import { Post } from 'src/post/post.entity';
 import { User } from './user.entity';
 import {Repository} from "typeorm";
+require('dotenv').config();
 
 
 @Injectable()
@@ -32,24 +34,21 @@ constructor(@InjectRepository(User) private userRepository: Repository<User>,
             { mail: loginData.userName }
           ]
         });
-    
+        console.log(user, "userenc")
         if (!user) {
           throw new HttpException("No se encontró usuario", HttpStatus.NOT_FOUND);
         }
-    
         const isPasswordValid = user.password === loginData.password;
-    
         if (!isPasswordValid) {
           throw new HttpException("Contraseña inválida", HttpStatus.UNAUTHORIZED);
         }
-    
-        const savedUser = await this.userRepository.save(user);
-    
-        // Aquí, si deseas, podrías generar un token JWT y enviarlo junto con el usuario
-        // Esto sería útil para mantener al usuario autenticado en sesiones posteriores
-    
+        const token = jwt.sign({id: user.id}, process.env.SECRET_KEY, {expiresIn: "4h"})
+        user.token = token
+        await this.userRepository.save(user);
+        const userWithoutPassword = { ...user };
+        delete userWithoutPassword.password;
         return {
-          user: savedUser
+          user: userWithoutPassword
         };
       } catch (error) {
         // Manejo de errores
@@ -57,8 +56,13 @@ constructor(@InjectRepository(User) private userRepository: Repository<User>,
       }
     }
 
-    getUser() {
-        return this.userRepository.find();
+    async getUser() {
+      try{
+         const rank = await this.userRepository.createQueryBuilder("user").orderBy("points", "DESC").getMany()
+         return rank;
+      } catch(err){
+         throw new HttpException("Error al encontrar usuarios", HttpStatus.INTERNAL_SERVER_ERROR);
+      }
      }
 
      async getOneUser(id: string) {

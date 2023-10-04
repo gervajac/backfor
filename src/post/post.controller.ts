@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Delete, Body, Patch, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, UseGuards, Patch, Param, NotFoundException } from '@nestjs/common';
 import { PostService } from './post.service';
+import { AuthMiddleware } from 'src/middleware/auth-middleware';
 
 @Controller('post')
 export class PostController {

@@ -94,6 +94,7 @@ export class PostService {
                 id: post.id,
                 title: post.title,
                 description: post.description,
+                image: post.image,
                 author: {
                     id: author.id,
                     name: author.name,
