@@ -5,6 +5,7 @@ import { CommentController } from './comment.controller';
 import { Comment } from './comment.entity';
 import { forwardRef } from '@nestjs/common/utils';
 import { UserModule } from 'src/user/user.module';
+import { User } from 'src/user/user.entity';
 import { PostModule } from 'src/post/post.module';
 import { Post } from 'src/post/post.entity';
 import { AuthMiddleware } from 'src/middleware/auth-middleware';
@@ -12,7 +13,7 @@ import { AuthMiddleware } from 'src/middleware/auth-middleware';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Comment]),TypeOrmModule.forFeature([Post]), UserModule, forwardRef(() => PostModule)],
+  imports: [TypeOrmModule.forFeature([Comment]),TypeOrmModule.forFeature([Post]), UserModule, forwardRef(() => PostModule), TypeOrmModule.forFeature([User])],
   controllers: [CommentController],
   providers: [CommentService, AuthMiddleware],
   exports: [CommentService]

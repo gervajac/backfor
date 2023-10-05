@@ -17,11 +17,15 @@ constructor(@InjectRepository(User) private userRepository: Repository<User>,
 
     async createUser(user) {
       const duplicateUser = await this.userRepository.findOne({
-         where: {
-            userName: user.userName 
-         }
+         where: [
+            { userName: user.userName },
+            { mail: user.mail }
+        ],
       })
-      if(duplicateUser) return new HttpException("El usuario ya existe", HttpStatus.CONFLICT)
+      if(duplicateUser){
+         throw new Error('User already exists');
+      }
+      console.log("aca no entra no?")
        const newUser = this.userRepository.create(user)
        return this.userRepository.save(newUser)
     }

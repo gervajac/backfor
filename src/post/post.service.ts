@@ -138,14 +138,18 @@ export class PostService {
     }
 
     async filterPost(word) {
+        const user = await this.userRepository.createQueryBuilder("user")
+        .where("user.userName LIKE :word", { word: `%${word}%` })
+        .getMany();
         const posts = await this.postRepository.createQueryBuilder("post")
             .leftJoinAndSelect("post.author", "author")
             .leftJoinAndSelect("post.comments", "comments")
             .where("post.title LIKE :word", { word: `%${word}%` })
             .getMany();
-
+        console.log(user)
         return {
-            post: posts
+            post: posts,
+            user: user
         };
     }
 
