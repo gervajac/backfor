@@ -37,24 +37,48 @@ export class CommentService {
     return this.commentRepository.save(newComment)
  }
 
- async getOnePost(id: string) {
-   console.log(id)
-   const commentsFound = await this.commentRepository.find({
-        where: {
-            postId: id
-        },
-        relations: ["author", "post"]
-    })
+ async getOnePost(id: string, page: number = 1, perPage: number = 10) {
+    console.log(id)
+    const skip = (page - 1) * perPage;
+  
+    const [commentsFound, totalComments] = await this.commentRepository.findAndCount({
+      where: {
+        postId: id
+      },
+      relations: ["author", "post"],
+      skip,
+      take: perPage
+    });
+  
     const postFound = await this.postRepository.findOne({
-        where: {
-            id: id
-        },
-        relations: ["author", "likes"]
-    })
-    console.log(postFound, "postencontrado")
+      where: {
+        id: id
+      },
+      relations: ["author", "likes"]
+    });
+  
+    console.log(postFound, "postencontrado");
+  
     if(!commentsFound) return new HttpException("Post no encontrado", HttpStatus.NOT_FOUND);
+    
     const likesIDs = postFound.likes.map(like => like.id);
-    return {commentsFound: commentsFound, postFound: postFound, likes: likesIDs};
- }
+    const totalPages = Math.ceil(totalComments / perPage);
+  
+    // Añadir el array con números
+    const numbersArray = Array.from({ length: totalPages }, (_, i) => i + 1);
+  
+    return {
+      pagination: {
+        totalComments: totalComments,
+        totalPages: totalPages,
+        currentPage: page,
+        numbersArray: numbersArray
+      },
+      commentsFound: commentsFound, 
+      postFound: postFound, 
+      likes: likesIDs,
+      
+    };
+  }
 
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Body, UseGuards, UseInterceptors, Patch, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Query, Body, UseGuards, UseInterceptors, Patch, Param, NotFoundException } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { AuthMiddleware } from 'src/middleware/auth-middleware';
 
@@ -15,13 +15,17 @@ export class CommentController {
         return this.CommentService.createComment(comment)
     }
 
-    @Get(":id")
-    async getOneUser(@Param("id") id: string) {
-      const foundPost = await this.CommentService.getOnePost(id);
-      if (!foundPost) {
-        throw new NotFoundException('Post no encontrado');
-      }
-      return foundPost;
+  @Get(':id')
+  async getCommentsByPostId(
+    @Param('id') id: string,
+    @Query('page') page: number = 1,
+    @Query('perPage') perPage: number = 10,
+  ) {
+    const foundPost = await this.CommentService.getOnePost(id, page, perPage);
+    if (!foundPost) {
+      throw new NotFoundException('Post no encontrado');
     }
+    return foundPost;
+  }
 
 }
