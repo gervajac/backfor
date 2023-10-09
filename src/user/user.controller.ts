@@ -24,7 +24,7 @@ export class UserController {
 
     @Post()
     createUser(@Body() newUser) {
-      console.log(newUser, "newsuser")
+      console.log(newUser, "newsuserr")
        return this.UserService.createUser(newUser)
     }
 
