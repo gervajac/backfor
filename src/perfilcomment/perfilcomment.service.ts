@@ -13,7 +13,7 @@ export class PerfilcommentService {
     private userService: UserService) {}
 
     async createPerfilComment(comment: any) {
-        console.log(comment, "llega acas?")
+        console.log(comment, "llega acass?")
 
         const newComment = this.PerfilcommentRepository.create(comment);
         return this.PerfilcommentRepository.save(newComment)
