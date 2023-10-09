@@ -38,7 +38,7 @@ export class PostController {
 
     @Get("/filter/:word")
     async getPostByWord(@Param("word") word: string) {
-      console.log(word, "wordd")
+      console.log(word, "worddd")
       const foundPost = await this.PostService.filterPost(word);
       if (!foundPost) {
         throw new NotFoundException('Post no encontrado');
