@@ -28,7 +28,7 @@ export class PostService {
             }
             const newPost = this.postRepository.create(post);
 
-            console.log(newPost, "nuyevospost")
+            console.log(newPost, "nuyevospostt")
             console.log(userFound)
             await this.userRepository.save(userFound)
             return this.postRepository.save(newPost);
