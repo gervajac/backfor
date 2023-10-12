@@ -11,13 +11,13 @@ import { PerfilcommentModule } from './perfilcomment/perfilcomment.module';
   imports: [
     TypeOrmModule.forRoot({
       type: "mysql",
-      host: "localhost",
+      host: "bck8ewbqw8ortwzafcbs-mysql.services.clever-cloud.com",
       port: 3306,
-      username: "root",
-      password: "password",
-      database: "forodb",
+      username: "unkh2mpsjrorsy4v",
+      password: "ECGVhaz8dXumWCPpQWQ3",
+      database: "bck8ewbqw8ortwzafcbs",
       entities: [__dirname + "/**/*.entity{.ts,.js}"],
-      synchronize: true
+      synchronize: true,
     }),
     UserModule,
     PostModule,
